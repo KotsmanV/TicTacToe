@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
@@ -19,7 +20,7 @@ namespace TicTacToe
         /// <summary>
         /// True = player 1, False = player 2
         /// </summary>
-        private bool mIsPlayer1;
+        private bool mIsPlayerOne;
         /// <summary>
         /// True = game ended
         /// /// </summary>
@@ -51,14 +52,14 @@ namespace TicTacToe
                 mResults[i] = MarkType.Free;
 
             //Make sure it's Player 1
-            mIsPlayer1 = true;
+            mIsPlayerOne = true;
 
             //Iterate every button on the grid
             Container.Children.Cast<Button>().ToList().ForEach(button => 
             {
                 //Change background, foreground and content to default values
                 button.Content = string.Empty;
-                button.Background = Brushes.White;
+                button.Background = Brushes.SeaShell;
                 button.Foreground = Brushes.Green;
             });
 
@@ -66,9 +67,122 @@ namespace TicTacToe
             mGameEnded = false;
         }
 
+
+        /// <summary>
+        /// Handles a button click event
+        /// </summary>
+        /// <param name="sender">The button that was clicked</param>
+        /// <param name="e">Click events</param>
         private void Button_Click(object sender, RoutedEventArgs e)
         {
+            if (mGameEnded)
+            {
+                NewGame();
+                return;
+            }
 
+            //Cast the sender to a button
+            var button = (Button) sender;
+
+            //Find the buttons position in the array
+            int column = Grid.GetColumn(button);
+            int row = Grid.GetRow(button);
+
+            int index = column + (row * 3);
+
+            //Don't do anything if the cell is already filled
+            if (mResults[index] != MarkType.Free)
+                return;
+
+            //Set the cell value based on which player's turn it is
+            mResults[index] = mIsPlayerOne ? MarkType.Cross : MarkType.Nought;
+
+            button.Content = mIsPlayerOne ? "X" : "O";
+
+            //Change noughts to red
+            if (!mIsPlayerOne)
+                button.Foreground = Brushes.OrangeRed;
+
+            //Toggle player turns
+            mIsPlayerOne = !mIsPlayerOne;
+
+            //Check for a winner
+            WinningCondition();
+        }
+
+
+        
+        private void WinningCondition()
+        {
+            MarkType[][] combinations =
+            {
+                new [] { mResults[0],mResults[1],mResults[2]},
+                new [] { mResults[3],mResults[4],mResults[5]},
+                new [] { mResults[6],mResults[7],mResults[8]},
+                new [] { mResults[0],mResults[3],mResults[6]},
+                new [] { mResults[1],mResults[4],mResults[7]},
+                new [] { mResults[2],mResults[5],mResults[8]},
+                new [] { mResults[0],mResults[4],mResults[8]},
+                new [] { mResults[6],mResults[4],mResults[2]}
+            };
+
+            Dictionary<int, Button> buttons = new Dictionary<int, Button>()
+            {
+                [0] = Zero,
+                [1] = One,
+                [2] = Two,
+                [3] = Three,
+                [4] = Four,
+                [5] = Five,
+                [6] = Six,
+                [7] = Seven,
+                [8] = Eight
+            };
+
+            //TODO: Fix winning condition
+            foreach (var combination in combinations)
+            {
+                if ((combination[0] & combination[1] & combination[2])!=MarkType.Free)
+                    if ((combination[0] & combination[1] & combination[2]) == combination[0])
+                        mGameEnded = true;
+
+                if (mGameEnded)
+                {
+                        foreach (var mt in combination)
+                        {
+                            var index = Array.FindIndex(mResults, symbol => symbol == mt);
+                            buttons.First(x=>x.Key==index).Value.Background = Brushes.Indigo;
+                        }
+                }
+
+                
+                
+            }
+
+
+
+            //bool same = (mResults[0] & mResults[1] & mResults[2]) == mResults[0];
+            //if (mResults[0]!= MarkType.Free && same)
+            //{
+            //    //Game ends
+            //    mGameEnded = true;
+
+            //    //Highlight
+            //    Button0_0.Background = Button1_0.Background = Button2_0.Background = Brushes.Indigo;
+            //}
+
+
+            if (!mResults.Any(result => result==MarkType.Free))
+            {
+                //Game ended
+                mGameEnded = true;
+
+                //Turn all cells gray
+                Container.Children.Cast<Button>().ToList().ForEach(button =>
+                {
+                    button.Background = Brushes.DimGray;
+                });
+            }
         }
     }
 }
