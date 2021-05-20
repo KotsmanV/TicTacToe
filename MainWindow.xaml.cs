@@ -13,14 +13,17 @@ namespace TicTacToe
     public partial class MainWindow : Window
     {
         #region Private Members
+
         /// <summary>
         /// Holds the current results of cells in the active game
         /// </summary>
         private MarkType[] mResults;
+
         /// <summary>
         /// True = player 1, False = player 2
         /// </summary>
         private bool mIsPlayerOne;
+
         /// <summary>
         /// True = game ended
         /// /// </summary>
@@ -55,7 +58,7 @@ namespace TicTacToe
             mIsPlayerOne = true;
 
             //Iterate every button on the grid
-            Container.Children.Cast<Button>().ToList().ForEach(button => 
+            Container.Children.Cast<Button>().ToList().ForEach(button =>
             {
                 //Change background, foreground and content to default values
                 button.Content = string.Empty;
@@ -111,21 +114,23 @@ namespace TicTacToe
         }
 
 
-        
+
         private void WinningCondition()
         {
             MarkType[][] combinations =
             {
-                new [] { mResults[0],mResults[1],mResults[2]},
-                new [] { mResults[3],mResults[4],mResults[5]},
-                new [] { mResults[6],mResults[7],mResults[8]},
-                new [] { mResults[0],mResults[3],mResults[6]},
-                new [] { mResults[1],mResults[4],mResults[7]},
-                new [] { mResults[2],mResults[5],mResults[8]},
-                new [] { mResults[0],mResults[4],mResults[8]},
-                new [] { mResults[6],mResults[4],mResults[2]}
+                new[] {mResults[0], mResults[1], mResults[2]},
+                new[] {mResults[3], mResults[4], mResults[5]},
+                new[] {mResults[6], mResults[7], mResults[8]},
+                new[] {mResults[0], mResults[3], mResults[6]},
+                new[] {mResults[1], mResults[4], mResults[7]},
+                new[] {mResults[2], mResults[5], mResults[8]},
+                new[] {mResults[0], mResults[4], mResults[8]},
+                new[] {mResults[6], mResults[4], mResults[2]}
             };
 
+
+            //Buttons by name
             Dictionary<int, Button> buttons = new Dictionary<int, Button>()
             {
                 [0] = Zero,
@@ -139,49 +144,42 @@ namespace TicTacToe
                 [8] = Eight
             };
 
-            //TODO: Fix winning condition
+           
             foreach (var combination in combinations)
             {
-                if ((combination[0] & combination[1] & combination[2])!=MarkType.Free)
+                if ((combination[0] & combination[1] & combination[2]) != MarkType.Free)
                     if ((combination[0] & combination[1] & combination[2]) == combination[0])
+                    {
                         mGameEnded = true;
-
-                if (mGameEnded)
-                {
-                        foreach (var mt in combination)
+                        var cmb = combination;
+ 
+                        
+                        //TODO: Fix cell painting
+                        foreach (var mt in cmb)
                         {
-                            var index = Array.FindIndex(mResults, symbol => symbol == mt);
-                            buttons.First(x=>x.Key==index).Value.Background = Brushes.Indigo;
+                            var index = Array.IndexOf(mResults, mt);
+                            if (buttons.ContainsKey(index))
+                                buttons[index].Background = Brushes.Indigo;
+                            
+                            //buttons.First(x => x.Key == index).Value.Background = Brushes.Indigo;
+
                         }
-                }
 
-                
-                
-            }
+                        break;
 
+                    }
 
-
-            //bool same = (mResults[0] & mResults[1] & mResults[2]) == mResults[0];
-            //if (mResults[0]!= MarkType.Free && same)
-            //{
-            //    //Game ends
-            //    mGameEnded = true;
-
-            //    //Highlight
-            //    Button0_0.Background = Button1_0.Background = Button2_0.Background = Brushes.Indigo;
-            //}
-
-
-            if (!mResults.Any(result => result==MarkType.Free))
-            {
-                //Game ended
-                mGameEnded = true;
-
-                //Turn all cells gray
-                Container.Children.Cast<Button>().ToList().ForEach(button =>
+                if (!mResults.Any(result => result == MarkType.Free))
                 {
-                    button.Background = Brushes.DimGray;
-                });
+                    //Game ended
+                    mGameEnded = true;
+
+                    //Turn all cells gray
+                    Container.Children.Cast<Button>().ToList().ForEach(button =>
+                    {
+                        button.Background = Brushes.DimGray;
+                    });
+                }
             }
         }
     }
