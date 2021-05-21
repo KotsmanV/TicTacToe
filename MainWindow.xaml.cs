@@ -114,9 +114,10 @@ namespace TicTacToe
         }
 
 
-
+        
         private void WinningCondition()
         {
+            //Winning combinations
             MarkType[][] combinations =
             {
                 new[] {mResults[0], mResults[1], mResults[2]},
@@ -144,7 +145,7 @@ namespace TicTacToe
                 [8] = Eight
             };
 
-           
+            //Checks all combinations if there's a winning one           
             foreach (var combination in combinations)
             {
                 if ((combination[0] & combination[1] & combination[2]) != MarkType.Free)
@@ -155,6 +156,9 @@ namespace TicTacToe
  
                         
                         //TODO: Fix cell painting
+                        //Θέλουμε να βρούμε στο combination που κέρδισε το index που έχει κάθε σύμβολο στη mResults,
+                        //οπότε μετά, με βάση αυτό το index, θα βρούμε τα buttons από το Dictionary και θα τους αλλάξουμε το χρώμα.
+                        //Κάτι λάθος παίζει όμως με τον κώδικα της foreach και μου βρίσκει μόνο ένα απ' τα 3 κουμπιά. Για βοηθήστε!!!
                         foreach (var mt in cmb)
                         {
                             var index = Array.IndexOf(mResults, mt);
